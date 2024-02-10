@@ -321,13 +321,14 @@ define('composer', [
 
 		var bodyEl = postContainer.find('textarea');
 		var submitBtn = postContainer.find('.composer-submit');
-
+		var anonymousBtn = postContainer.find('.composer-anonymous');
 		categoryList.init(postContainer, composer.posts[post_uuid]);
 		scheduler.init(postContainer, composer.posts);
 
 		formatting.addHandler(postContainer);
 		formatting.addComposerButtons();
 		preview.handleToggler(postContainer);
+		//anonymous.handleToggler(postContainer);
 
 		uploads.initialize(post_uuid);
 		tags.init(postContainer, composer.posts[post_uuid]);
@@ -341,12 +342,22 @@ define('composer', [
 			drafts.updateVisibility('open', composer.posts[post_uuid].save_id, true);
 		});
 
+
 		submitBtn.on('click', function (e) {
 			e.preventDefault();
 			e.stopPropagation();	// Other click events bring composer back to active state which is undesired on submit
-
+			//add some kind of anonymous attribute here
 			$(this).attr('disabled', true);
 			post(post_uuid);
+		});
+
+		anonymousBtn.on('click', function (btn) {
+			if(btn.value == "Hide username") {
+				btn.value == 'Show username';
+			}
+			else {
+				btn.value == "Hide Username";
+			}
 		});
 
 		require(['mousetrap'], function (mousetrap) {
