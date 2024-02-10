@@ -22,8 +22,8 @@ define('composer', [
 	'messages',
 	'search',
 	'screenfull',
-], function (taskbar, translator, uploads, formatting, drafts, tags,
-	categoryList, preview, anonymous, resize, autocomplete, scheduler, scrollStop,
+], function (taskbar, translator, anonymous, uploads, formatting, drafts, tags,
+	categoryList, preview, resize, autocomplete, scheduler, scrollStop,
 	topicThumbs, api, bootbox, alerts, hooks, messagesModule, search, screenfull) {
 	var composer = {
 		active: undefined,
@@ -321,14 +321,14 @@ define('composer', [
 
 		var bodyEl = postContainer.find('textarea');
 		var submitBtn = postContainer.find('.composer-submit');
-		var anonymousBtn = postContainer.find('.composer-anonymous');
+
 		categoryList.init(postContainer, composer.posts[post_uuid]);
 		scheduler.init(postContainer, composer.posts);
 
 		formatting.addHandler(postContainer);
 		formatting.addComposerButtons();
 		preview.handleToggler(postContainer);
-		//anonymous.handleToggler(postContainer);
+		anonymous.create(postContainer);
 
 		uploads.initialize(post_uuid);
 		tags.init(postContainer, composer.posts[post_uuid]);
@@ -342,22 +342,14 @@ define('composer', [
 			drafts.updateVisibility('open', composer.posts[post_uuid].save_id, true);
 		});
 
-
 		submitBtn.on('click', function (e) {
 			e.preventDefault();
 			e.stopPropagation();	// Other click events bring composer back to active state which is undesired on submit
-			//add some kind of anonymous attribute here
+			if(anonymous.getState) {
+				postData.uid = 10;
+			}
 			$(this).attr('disabled', true);
 			post(post_uuid);
-		});
-
-		anonymousBtn.on('click', function (btn) {
-			if(btn.value == "Hide username") {
-				btn.value == 'Show username';
-			}
-			else {
-				btn.value == "Hide Username";
-			}
 		});
 
 		require(['mousetrap'], function (mousetrap) {
@@ -441,7 +433,7 @@ define('composer', [
 		var isTopic = postData ? postData.hasOwnProperty('cid') : false;
 		var isMain = postData ? !!postData.isMain : false;
 		var isEditing = postData ? !!postData.pid : false;
-		var isGuestPost = postData ? parseInt(postData.uid, 10) === 0 : false;
+		var isGuestPost = postData ? true/*parseInt(postData.uid, 10) === 0*/ : false;
 		const isScheduled = postData.timestamp > Date.now();
 
 		// see
@@ -737,6 +729,7 @@ define('composer', [
 			action: action,
 			composerData: composerData,
 			postData: postData,
+			//add anonymous data here?
 			redirect: true,
 		};
 

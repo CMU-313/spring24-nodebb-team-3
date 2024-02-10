@@ -1,50 +1,29 @@
 'use strict';
 
-define('composer/anonymous', ['hooks'], function (hooks) {
+//TODO make some kind of anonymous property
+define('composer/anonymous', [], function () {
 	var anonymous = {};
+    var state = {
+        isSel: false
+    }
 
-	anonymous.handleToggler = function (postContainer) {
-		var showBtn = postContainer.find('.write-container .toggle-anon');
-		var hideBtn = postContainer.find('.preview-container .toggle-anon');
+    //Function for setting a button state
+    anonymous.create = function (postContainer) {
+        var anonymousBtn = postContainer.find('.anonymous-post-opt');
 
-		function hidePreview() {
-			togglePreview(false);
-			localStorage.setItem('composer:anonymousToggled', !(localStorage.getItem('composer:anonymousToggled')));
-		}
+        anonymousBtn.addEventListener('click', onBtnSel);
+        state.isSel = false;
+    }
 
-		function showPreview() {
-			togglePreview(true);
-			if (preview.env !== 'xs' && preview.env !== 'sm') {
-				localStorage.removeItem('composer:anonymousToggled');
-			}
-		}
+    // Returns true if anonymous, false if not
+    anonymous.getState = function () {
+        return state.isSel;
+    }
 
-		function togglePreview(show) {
-			if (preview.env === 'xs' || preview.env === 'sm') {
-				showBtn.toggleClass('hide', true);
-			} else {
-				showBtn.toggleClass('hide', show);
-			}
+    //On click
+    function onBtnSel() {
+        state.isSel = !state.isSel;
+    }
+    return anonymous;
 
-			preview.matchScroll(postContainer);
-		}
-		preview.toggle = togglePreview;
-
-		hideBtn.on('click', function () {
-			hidePreview();
-			postContainer.find('.write').focus();
-		});
-		showBtn.on('click', function () {
-			showPreview();
-			postContainer.find('.write').focus();
-		});
-
-		if (localStorage.getItem('composer:previewToggled') || (preview.env === 'xs' || preview.env === 'sm')) {
-			hidePreview();
-		} else {
-			showPreview();
-		}
-	};
-
-	return preview;
 });

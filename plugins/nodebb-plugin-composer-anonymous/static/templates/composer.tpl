@@ -126,6 +126,10 @@
 						<!-- END tagWhitelist -->
 					</ul>
 				</div>
+				<div class ="anonymous-post-opt">
+					<input class="mdl-switch__input" type="checkbox" name="enAnonymous" />
+					<span class="mdl-switch__label"><strong>Hide Username</strong></span>
+				</div>
 				<input class="tags" type="text" class="form-control" placeholder="[[tags:enter_tags_here, {minimumTagLength}, {maximumTagLength}]]" tabindex="5"/>
 			</div>
 		</div>
