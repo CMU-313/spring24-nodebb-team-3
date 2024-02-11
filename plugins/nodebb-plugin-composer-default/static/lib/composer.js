@@ -22,8 +22,8 @@ define('composer', [
 	'messages',
 	'search',
 	'screenfull',
-], function (taskbar, translator, anonymous, uploads, formatting, drafts, tags,
-	categoryList, preview, resize, autocomplete, scheduler, scrollStop,
+], function (taskbar, translator, uploads, formatting, drafts, tags,
+	categoryList, preview, resize, autocomplete, scheduler, anonymous, scrollStop,
 	topicThumbs, api, bootbox, alerts, hooks, messagesModule, search, screenfull) {
 	var composer = {
 		active: undefined,
@@ -328,6 +328,7 @@ define('composer', [
 		formatting.addHandler(postContainer);
 		formatting.addComposerButtons();
 		preview.handleToggler(postContainer);
+		
 		anonymous.create(postContainer);
 
 		uploads.initialize(post_uuid);
@@ -345,9 +346,9 @@ define('composer', [
 		submitBtn.on('click', function (e) {
 			e.preventDefault();
 			e.stopPropagation();	// Other click events bring composer back to active state which is undesired on submit
-			if(anonymous.getState) {
-				postData.uid = 10;
-			}
+			// if(anonymous.getState) {
+			// 	postData.uid = 10;
+			// }
 			$(this).attr('disabled', true);
 			post(post_uuid);
 		});
@@ -433,7 +434,7 @@ define('composer', [
 		var isTopic = postData ? postData.hasOwnProperty('cid') : false;
 		var isMain = postData ? !!postData.isMain : false;
 		var isEditing = postData ? !!postData.pid : false;
-		var isGuestPost = postData ? true/*parseInt(postData.uid, 10) === 0*/ : false;
+		var isGuestPost = postData ? parseInt(postData.uid, 10) === 0 : false;
 		const isScheduled = postData.timestamp > Date.now();
 
 		// see

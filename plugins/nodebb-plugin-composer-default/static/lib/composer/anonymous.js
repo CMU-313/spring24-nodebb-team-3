@@ -1,18 +1,16 @@
 'use strict';
 
-//TODO make some kind of anonymous property
 define('composer/anonymous', [], function () {
-	var anonymous = {};
-    var state = {
+	const anonymous = {};
+    const state = {
         isSel: false
     }
-
+    let anonymousBtn;
     //Function for setting a button state
     anonymous.create = function (postContainer) {
-        var anonymousBtn = postContainer.find('.anonymous-post-opt');
-
-        anonymousBtn.addEventListener('click', onBtnSel);
         state.isSel = false;
+        anonymousBtn = postContainer[0].querySelector('.anonymous-post-opt');
+        anonymousBtn.addEventListener('click', onBtnSel);
     }
 
     // Returns true if anonymous, false if not
