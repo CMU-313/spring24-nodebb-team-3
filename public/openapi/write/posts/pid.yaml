@@ -65,7 +65,7 @@ get:
                   downvoted:
                     type: boolean
                   isAnon:
-                    type: boolean
+                    type: number
                     required: false
 put:
   tags:
