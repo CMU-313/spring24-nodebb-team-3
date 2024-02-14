@@ -35,6 +35,7 @@ module.exports = function (Posts) {
             tid: tid,
             content: content,
             timestamp: timestamp,
+            isAnon: data.isAnon,
         };
 
         if (data.toPid) {

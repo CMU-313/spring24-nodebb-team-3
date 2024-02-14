@@ -11,6 +11,7 @@ export type PostObject = {
   deleted: boolean;
   upvotes: number;
   downvotes: number;
+  isAnon: boolean;
   votes: number;
   timestampISO: string;
   user: UserObjectSlim;

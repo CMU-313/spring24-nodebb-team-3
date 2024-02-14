@@ -68,6 +68,7 @@ type ComposerData = {
     tags?: string[],
     thumb?: string,
     noscript?: string
+    isAnon?: boolean,
 }
 
 type QueueResult = {
@@ -87,10 +88,12 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
         timestamp: Date.now(),
         content: body.content,
         fromQueue: false,
+        isAnon: body.isAnon,
     };
     req.body.noscript = 'true';
-
+    console.log("inside post")
     if (!data.content) {
+        
         return await helpers.noScriptErrors(req, res, '[[error:invalid-data]]', 400) as Promise<void>;
     }
 
@@ -110,6 +113,7 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
 
     try {
         let result: QueueResult;
+        console.log("inside post, setting data?");
         if (body.tid) {
             data.tid = body.tid;
             result = await queueOrPost(topics.reply as PostFnType, data);
@@ -118,6 +122,7 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
             data.title = body.title;
             data.tags = [];
             data.thumb = '';
+            data.isAnon = body.isAnon;
             result = await queueOrPost(topics.post as PostFnType, data);
         } else {
             throw new Error('[[error:invalid-data]]');

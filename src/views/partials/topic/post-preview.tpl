@@ -2,7 +2,7 @@
     <div class="clearfix">
         <div class="icon pull-left">
             <a href="{{{ if post.user.userslug }}}{config.relative_path}/user/{post.user.userslug}{{{ else }}}#{{{ end }}}">
-                {buildAvatar(post.user, "sm", true, "", "user/picture")} {post.user.username}
+                {buildAvatar_post(post.user, "sm", true, "", "user/picture", post.isAnon)} {post.user.username}
             </a>
         </div>
         <small class="pull-right">

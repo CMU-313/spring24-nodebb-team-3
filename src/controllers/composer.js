@@ -57,8 +57,10 @@ function post(req, res) {
             timestamp: Date.now(),
             content: body.content,
             fromQueue: false,
+            isAnon: body.isAnon,
         };
         req.body.noscript = 'true';
+        console.log("inside post");
         if (!data.content) {
             return yield helpers_1.default.noScriptErrors(req, res, '[[error:invalid-data]]', 400);
         }
@@ -78,6 +80,7 @@ function post(req, res) {
         }
         try {
             let result;
+            console.log("inside post, setting data?");
             if (body.tid) {
                 data.tid = body.tid;
                 result = yield queueOrPost(topics_1.default.reply, data);
@@ -87,6 +90,7 @@ function post(req, res) {
                 data.title = body.title;
                 data.tags = [];
                 data.thumb = '';
+                data.isAnon = body.isAnon;
                 result = yield queueOrPost(topics_1.default.post, data);
             }
             else {

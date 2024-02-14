@@ -192,7 +192,7 @@ module.exports = function (Topics) {
         if (parseInt(uid, 10)) {
             user.setUserField(uid, 'lastonline', Date.now());
         }
-
+        //Note: may want to make changes here later 
         if (parseInt(uid, 10) || meta.config.allowGuestReplyNotifications) {
             const { displayname } = postData.user;
 
