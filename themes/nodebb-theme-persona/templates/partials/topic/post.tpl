@@ -17,7 +17,7 @@
             <!-- IF posts.isAnon -->
                 <a href="" itemprop="author" data-username="Username" data-uid="{posts.user.uid}">Anonymous Poster</a>
             <!-- ELSE -->
-                <a href="{config.relative_path}/user/{posts.user.userslug}" itemprop="author" data-username="{post.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname}</a>
+                <a href="{config.relative_path}/user/{posts.user.userslug}" itemprop="author" data-username="{post.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname} ({posts.user.accounttype})</a>
             <!-- ENDIF posts.isAnon -->
         </strong>
 
