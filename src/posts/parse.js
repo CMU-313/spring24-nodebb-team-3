@@ -54,9 +54,9 @@ module.exports = function (Posts) {
         }
         postData.content = String(postData.content || '');
 
-        // postData.content = postData.content.replace(/\$\$(.*?)\$\$/g, function (match, latex) {
-        //     return katex.renderToString(latex, { displayMode: true });
-        // });
+        postData.content = postData.content.replace(/\$\$(.*?)\$\$/g, function (match, latex) {
+            return katex.renderToString(latex, { displayMode: true });
+        });
 
         const cache = require('./cache');
         const pid = String(postData.pid);
