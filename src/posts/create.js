@@ -37,6 +37,7 @@ module.exports = function (Posts) {
             timestamp: timestamp,
             isAnon: data.isAnon,
         };
+        console.assert(typeof postData.isAnon === 'boolean', 'Variable postData.isAnon is not of right type');
 
         if (data.toPid) {
             postData.toPid = data.toPid;

@@ -289,7 +289,9 @@ module.exports = function (utils, Benchpress, relative_path) {
 
         return icons;
     }
-    function buildAvatar_post(userObj, size, rounded, classNames, component, isAnon){
+
+    /* Expanded  uild avatar to post anonymously on conditions */
+    function buildAvatar_post(userObj, size, rounded, classNames, component, isAnon) {
         /**
          * userObj requires:
          *   - uid, picture, icon:bgColor, icon:text (getUserField w/ "picture" should return all 4), username
@@ -299,20 +301,24 @@ module.exports = function (utils, Benchpress, relative_path) {
          * component: overrides the default component (optional, default none)
          */
 
+        // Checking types of inputs:
+        // console.assert(typeof userObj === 'userObjectSlim' || !userObj, 'Variable: userObj is of unexpected type');
+        console.assert(typeof size === 'string', 'Variable: size is of unexpected type');
+        console.assert(typeof rounded === 'boolean', 'Variable: rounded is of unexpected type');
         // Try to use root context if passed-in userObj is undefined
+        var to_return = '';
         if (!userObj) {
             userObj = this;
         }
-        if(isAnon) {
+        if (isAnon) {
             const attributes = [
-                'alt="' + "Anonymous Poster" + '"',
-                'title="' + "Anonymous" + '"',
-                'data-uid="' + 0 + '"',
+                'alt="Anonymous Poster"',
+                'title="Anonymous"',
+                'data-uid="0"',
                 'loading="lazy"',
             ];
             const styles = [];
             classNames = classNames || '';
-    
             // Validate sizes, handle integers, otherwise fall back to `avatar-sm`
             if (['xs', 'sm', 'sm2x', 'md', 'lg', 'xl'].includes(size)) {
                 classNames += ' avatar-' + size;
@@ -322,19 +328,15 @@ module.exports = function (utils, Benchpress, relative_path) {
                 classNames += ' avatar-sm';
             }
             attributes.unshift('class="avatar ' + classNames + (rounded ? ' avatar-rounded' : '') + '"');
-    
             // Component override
             if (component) {
                 attributes.push('component="' + component + '"');
             } else {
-                attributes.push('component="avatar/' + 'icon' + '"');
+                attributes.push('component="avatar/icon"');
             }
-    
-    
-            styles.push('background-color: ' + '#f44336' + ';');
-            return '<span ' + attributes.join(' ') + ' style="' + styles.join(' ') + '">' + 'A' + '</span>';
-        }
-        else {
+            styles.push('background-color:#f44336;');
+            to_return = '<span ' + attributes.join(' ') + ' style="' + styles.join(' ') + '">A</span>';
+        } else {
             const attributes = [
                 'alt="' + userObj.username + '"',
                 'title="' + userObj.username + '"',
@@ -343,7 +345,6 @@ module.exports = function (utils, Benchpress, relative_path) {
             ];
             const styles = [];
             classNames = classNames || '';
-    
             // Validate sizes, handle integers, otherwise fall back to `avatar-sm`
             if (['xs', 'sm', 'sm2x', 'md', 'lg', 'xl'].includes(size)) {
                 classNames += ' avatar-' + size;
@@ -353,24 +354,24 @@ module.exports = function (utils, Benchpress, relative_path) {
                 classNames += ' avatar-sm';
             }
             attributes.unshift('class="avatar ' + classNames + (rounded ? ' avatar-rounded' : '') + '"');
-    
             // Component override
             if (component) {
                 attributes.push('component="' + component + '"');
             } else {
                 attributes.push('component="avatar/' + (userObj.picture ? 'picture' : 'icon') + '"');
             }
-    
             if (userObj.picture) {
                 return '<img ' + attributes.join(' ') + ' src="' + userObj.picture + '" style="' + styles.join(' ') + '" />';
             }
-    
             styles.push('background-color: ' + userObj['icon:bgColor'] + ';');
-            return '<span ' + attributes.join(' ') + ' style="' + styles.join(' ') + '">' + userObj['icon:text'] + '</span>';
+            to_return = '<span ' + attributes.join(' ') + ' style="' + styles.join(' ') + '">' + userObj['icon:text'] + '</span>';
         }
-        
+        console.assert(typeof to_return === 'string');
+        return to_return;
     }
-    function buildAvatar_anon(userObj, size, rounded, classNames, component, isAnon){
+
+    /* Expanded buildAvatar to post anonymously */
+    function buildAvatar_anon(userObj, size, rounded, classNames, component) {
         /**
          * userObj requires:
          *   - uid, picture, icon:bgColor, icon:text (getUserField w/ "picture" should return all 4), username
@@ -379,37 +380,40 @@ module.exports = function (utils, Benchpress, relative_path) {
          * classNames: additional class names to prepend (optional, default none)
          * component: overrides the default component (optional, default none)
          */
-
+        // Checking types of inputs...
+        // console.assert(typeof userObj === 'userObjectSlim' || !userObj, 'Variable: userObj is of unexpected type');
+        console.assert(typeof size === 'string', 'Variable: size is of unexpected type');
+        console.assert(typeof rounded === 'boolean', 'Variable: rounded is of unexpected type');
         // Try to use root context if passed-in userObj is undefined
         const attributes = [
-                'alt="' + "Anonymous Poster" + '"',
-                'title="' + "Anonymous" + '"',
-                'data-uid="' + 0 + '"',
-                'loading="lazy"',
-            ];
-            const styles = [];
-            classNames = classNames || '';
-    
-            // Validate sizes, handle integers, otherwise fall back to `avatar-sm`
-            if (['xs', 'sm', 'sm2x', 'md', 'lg', 'xl'].includes(size)) {
-                classNames += ' avatar-' + size;
-            } else if (!isNaN(parseInt(size, 10))) {
-                styles.push('width: ' + size + 'px;', 'height: ' + size + 'px;', 'line-height: ' + size + 'px;', 'font-size: ' + (parseInt(size, 10) / 16) + 'rem;');
-            } else {
-                classNames += ' avatar-sm';
-            }
-            attributes.unshift('class="avatar ' + classNames + (rounded ? ' avatar-rounded' : '') + '"');
-    
-            // Component override
-            if (component) {
-                attributes.push('component="' + component + '"');
-            } else {
-                attributes.push('component="avatar/' + 'icon' + '"');
-            }
-    
-            styles.push('background-color: ' + '#f44336' + ';');
-            return '<span ' + attributes.join(' ') + ' style="' + styles.join(' ') + '">' + 'A' + '</span>';
+            'alt="Anonymous Poster"',
+            'title="Anonymous"',
+            'data-uid="0"',
+            'loading="lazy"',
+        ];
+        const styles = [];
+        classNames = classNames || '';
+        // Validate sizes, handle integers, otherwise fall back to `avatar-sm`
+        if (['xs', 'sm', 'sm2x', 'md', 'lg', 'xl'].includes(size)) {
+            classNames += ' avatar-' + size;
+        } else if (!isNaN(parseInt(size, 10))) {
+            styles.push('width: ' + size + 'px;', 'height: ' + size + 'px;', 'line-height: ' + size + 'px;', 'font-size: ' + (parseInt(size, 10) / 16) + 'rem;');
+        } else {
+            classNames += ' avatar-sm';
+        }
+        attributes.unshift('class="avatar ' + classNames + (rounded ? ' avatar-rounded' : '') + '"');
+        // Component override
+        if (component) {
+            attributes.push('component="' + component + '"');
+        } else {
+            attributes.push('component="avatar/icon"');
+        }
+        styles.push('background-color:#f44336;');
+        var to_return = '<span ' + attributes.join(' ') + ' style="' + styles.join(' ') + '">A</span>';
+        console.assert(typeof to_return === 'string');
+        return to_return;
     }
+
     function buildAvatar(userObj, size, rounded, classNames, component) {
         /**
          * userObj requires:

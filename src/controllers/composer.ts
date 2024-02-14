@@ -90,13 +90,11 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
         fromQueue: false,
         isAnon: body.isAnon,
     };
+    console.assert(typeof data.isAnon === 'boolean', 'Variable data.isAnon is not of right type');
     req.body.noscript = 'true';
-    console.log("inside post")
     if (!data.content) {
-        
         return await helpers.noScriptErrors(req, res, '[[error:invalid-data]]', 400) as Promise<void>;
     }
-
     async function queueOrPost(postFn: PostFnType, data: ComposerData): Promise<QueueResult> {
         // The next line calls a function in a module that has not been updated to TS yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -113,7 +111,6 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
 
     try {
         let result: QueueResult;
-        console.log("inside post, setting data?");
         if (body.tid) {
             data.tid = body.tid;
             result = await queueOrPost(topics.reply as PostFnType, data);

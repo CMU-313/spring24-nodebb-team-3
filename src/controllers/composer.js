@@ -59,8 +59,8 @@ function post(req, res) {
             fromQueue: false,
             isAnon: body.isAnon,
         };
+        console.assert(typeof data.isAnon === 'boolean', 'Variable data.isAnon is not of right type');
         req.body.noscript = 'true';
-        console.log("inside post");
         if (!data.content) {
             return yield helpers_1.default.noScriptErrors(req, res, '[[error:invalid-data]]', 400);
         }
@@ -80,7 +80,6 @@ function post(req, res) {
         }
         try {
             let result;
-            console.log("inside post, setting data?");
             if (body.tid) {
                 data.tid = body.tid;
                 result = yield queueOrPost(topics_1.default.reply, data);

@@ -142,6 +142,7 @@ module.exports = function (Posts) {
         let postData = await Posts.getPostsFields(pids, [
             'pid', 'tid', 'uid', 'content', 'deleted', 'timestamp', 'upvotes', 'downvotes', 'isAnon',
         ]);
+        console.assert(typeof postData.isAnon === 'boolean', 'Variable postData.isAnon is not of right type');
         postData = postData.filter(p => p.pid && p.uid !== parseInt(toUid, 10));
         pids = postData.map(p => p.pid);
 
