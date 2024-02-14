@@ -1,0 +1,107 @@
+diff --git a/node_modules/nodebb-plugin-composer-default/plugin.json b/node_modules/nodebb-plugin-composer-default/plugin.json
+index 1c793c5..5fc8d45 100644
+--- a/node_modules/nodebb-plugin-composer-default/plugin.json
++++ b/node_modules/nodebb-plugin-composer-default/plugin.json
+@@ -25,6 +25,7 @@
+ 		"composer/preview.js": "./static/lib/composer/preview.js",
+ 		"composer/resize.js": "./static/lib/composer/resize.js",
+ 		"composer/scheduler.js": "./static/lib/composer/scheduler.js",
++		"composer/anonymous.js": "./static/lib/composer/anonymous.js",
+ 		"composer/tags.js": "./static/lib/composer/tags.js",
+ 		"composer/uploads.js": "./static/lib/composer/uploads.js",
+ 		"composer/autocomplete.js": "./static/lib/composer/autocomplete.js",
+diff --git a/node_modules/nodebb-plugin-composer-default/static/lib/composer.js b/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
+index 46334e7..a904ac3 100644
+--- a/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
++++ b/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
+@@ -12,6 +12,7 @@ define('composer', [
+ 	'composer/resize',
+ 	'composer/autocomplete',
+ 	'composer/scheduler',
++	'composer/anonymous',
+ 	'scrollStop',
+ 	'topicThumbs',
+ 	'api',
+@@ -22,7 +23,7 @@ define('composer', [
+ 	'search',
+ 	'screenfull',
+ ], function (taskbar, translator, uploads, formatting, drafts, tags,
+-	categoryList, preview, resize, autocomplete, scheduler, scrollStop,
++	categoryList, preview, resize, autocomplete, scheduler, anonymous, scrollStop,
+ 	topicThumbs, api, bootbox, alerts, hooks, messagesModule, search, screenfull) {
+ 	var composer = {
+ 		active: undefined,
+@@ -327,6 +328,7 @@ define('composer', [
+ 		formatting.addHandler(postContainer);
+ 		formatting.addComposerButtons();
+ 		preview.handleToggler(postContainer);
++		anonymous.create(postContainer);
+ 
+ 		uploads.initialize(post_uuid);
+ 		tags.init(postContainer, composer.posts[post_uuid]);
+@@ -696,6 +698,7 @@ define('composer', [
+ 				cid: categoryList.getSelectedCid(),
+ 				tags: tags.getTags(post_uuid),
+ 				timestamp: scheduler.getTimestamp(),
++				isAnon: anonymous.getState(),
+ 			};
+ 		} else if (action === 'posts.reply') {
+ 			route = `/topics/${postData.tid}`;
+@@ -718,6 +721,7 @@ define('composer', [
+ 				thumb: thumbEl.val() || '',
+ 				tags: tags.getTags(post_uuid),
+ 				timestamp: scheduler.getTimestamp(),
++				isAnon: anonymous.getState(),
+ 			};
+ 		}
+ 		var submitHookData = {
+diff --git a/node_modules/nodebb-plugin-composer-default/static/lib/composer/anonymous.js b/node_modules/nodebb-plugin-composer-default/static/lib/composer/anonymous.js
+new file mode 100644
+index 0000000..70764cc
+--- /dev/null
++++ b/node_modules/nodebb-plugin-composer-default/static/lib/composer/anonymous.js
+@@ -0,0 +1,28 @@
++'use strict';
++
++define('composer/anonymous', [], function () {
++	const anonymous = {};
++    const state = {
++        isSel: false
++    }
++    let anonymousBtn;
++    //Function for setting a button state
++    anonymous.create = function (postContainer) {
++        state.isSel = false;
++        anonymousBtn = postContainer[0].querySelector('.anonymous-post-opt');
++        anonymousBtn.addEventListener('click', onBtnSel);
++    }
++
++    // Returns true if anonymous, false if not
++    anonymous.getState = function () {
++        return state.isSel;
++    }
++
++    //On click
++    function onBtnSel() {
++        console.log("button was toggled");
++        state.isSel = !state.isSel;
++    }
++    return anonymous;
++
++});
+\ No newline at end of file
+diff --git a/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl b/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
+index cf9de24..62dfdf0 100644
+--- a/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
++++ b/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
+@@ -91,6 +91,10 @@
+ 						<input type="file" id="files" name="files[]" multiple class="gte-ie9 hide"/>
+ 					</form>
+ 				</ul>
++				<div class ="anonymous-post-opt">
++					<input class="mdl-switch__input" type="checkbox" name="enAnonymous" />
++					<span class="mdl-switch__label"><strong>Hide Username</strong></span>
++				</div>
+ 			</div>
+ 		</div>
+ 
