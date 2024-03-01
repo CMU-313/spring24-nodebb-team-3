@@ -1243,3 +1243,35 @@ describe('Posts\'', async () => {
         });
     });
 });
+
+describe('LaTeX Rendering', () => {
+    let testPostPid;
+
+    before(async () => {
+        const result = await posts.create({
+            uid: 1,
+            cid: 1,
+            title: 'Test LaTeX Post',
+            content: 'Here is a LaTeX equation: $E = mc^2$',
+        });
+        testPostPid = result.postData.pid;
+    });
+
+    it('should correctly parse LaTeX syntax within posts', async () => {
+        const postData = await posts.getPostData(testPostPid);
+        assert.ok(postData.content.includes('LaTeX equation'), 'Post content should include reference to LaTeX');
+        assert.ok(parseLaTeX.calledWith(postData.content), 'LaTeX parsing function should be called with post content');
+    });
+
+    it('should render LaTeX syntax correctly', async () => {
+        const renderedContent = await renderLaTeX('Here is a LaTeX equation: $E = mc^2$');
+        assert.ok(renderedContent.includes('<img src="latex_equation_image.png"'), 'Rendered content should include an image tag for the LaTeX equation');
+    });
+
+    it('should handle malformed LaTeX syntax gracefully', async () => {
+        const contentWithMalformedLaTeX = 'This is malformed: $E = mc^2';
+        const renderedContent = await renderLaTeX(contentWithMalformedLaTeX);
+        assert.ok(renderedContent.includes('Error rendering LaTeX'), 'Rendered content should indicate an error for malformed LaTeX syntax');
+    });
+});
+

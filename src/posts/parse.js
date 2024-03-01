@@ -48,15 +48,30 @@ module.exports = function (Posts) {
         length: 5,
     };
 
+    /* type PostObject = {
+        pid: number;
+        tid: number;
+        content: string;
+        uid: number;
+        timestamp: number;
+        deleted: boolean;
+        upvotes: number;
+        downvotes: number;
+        votes: number;
+        timestampISO: string;
+        user: UserObjectSlim;
+        topic: TopicObject;
+        category: CategoryObject;
+        isMainPost: boolean;
+        replies: number;
+    };
+    */
     Posts.parsePost = async function (postData) {
         if (!postData) {
             return postData;
         }
         postData.content = String(postData.content || '');
 
-        postData.content = postData.content.replace(/\$\$(.*?)\$\$/g, function (match, latex) {
-            return katex.renderToString(latex, { displayMode: true });
-        });
 
         const cache = require('./cache');
         const pid = String(postData.pid);
@@ -66,7 +81,33 @@ module.exports = function (Posts) {
             return postData;
         }
 
+        const render = function (postData) {
+            console.assert(typeof postData === 'object', 'postData.pid is not an object');
+            console.assert(typeof postData.content === 'string', 'postData.content is not a string');
+
+            // eslint-disable-next-line no-unused-vars
+            const doublerendering = function (match, p1, offset, string) {
+                return katex.renderToString(p1, { displayMode: true, output: 'mathml' });
+            };
+            // eslint-disable-next-line no-unused-vars
+            const singlerendering = function (match, p1, offset, string) {
+                return katex.renderToString(p1, { displayMode: false, output: 'mathml' });
+            };
+            
+            const double = /\$\$([\s\S]*?)\$\$/g; 
+            const single = /\$([\s\S]*?)\$/g; 
+
+            try {
+                postData.content = postData.content.replace(double, doublerendering).replace(single, singlerendering);
+            } catch (a) {
+                winston.verbose(a.message);
+            }
+        };
+
         const data = await plugins.hooks.fire('filter:parse.post', { postData: postData });
+
+        render(data.postData); 
+
         data.postData.content = translator.escape(data.postData.content);
         if (data.postData.pid) {
             cache.set(pid, data.postData.content);
