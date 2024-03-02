@@ -183,19 +183,16 @@ module.exports = function (Topics) {
         data.ip = data.req ? data.req.ip : null;
         let postData = await posts.create(data);
         postData = await onNewPost(postData, data);
-
         const settings = await user.getSettings(uid);
         if (uid > 0 && settings.followTopicsOnReply) {
             await Topics.follow(postData.tid, uid);
         }
-
         if (parseInt(uid, 10)) {
             user.setUserField(uid, 'lastonline', Date.now());
         }
-
+        // Note: may want to make changes here later
         if (parseInt(uid, 10) || meta.config.allowGuestReplyNotifications) {
             const { displayname } = postData.user;
-
             Topics.notifyFollowers(postData, uid, {
                 type: 'new-reply',
                 bodyShort: translator.compile('notifications:user_posted_to', displayname, postData.topic.title),

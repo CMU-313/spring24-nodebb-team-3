@@ -44,10 +44,10 @@
                         <div class="col-lg-2 col-xs-12">
                             <strong>[[post-queue:user]]</strong>
                             <div>
-                                {{{ if posts.user.userslug}}}
+                                {{{ if posts.isAnon}}}
                                 <a href="{config.relative_path}/uid/{posts.user.uid}">{buildAvatar(posts.user, "24", true, "not-responsive")} {posts.user.username}</a>
                                 {{{ else }}}
-                                {posts.user.username}
+                                Anonymous
                                 {{{ end }}}
                             </div>
                         </div>

@@ -57,7 +57,9 @@ function post(req, res) {
             timestamp: Date.now(),
             content: body.content,
             fromQueue: false,
+            isAnon: body.isAnon,
         };
+        console.assert(typeof data.isAnon === 'boolean', 'Variable data.isAnon is not of right type');
         req.body.noscript = 'true';
         if (!data.content) {
             return yield helpers_1.default.noScriptErrors(req, res, '[[error:invalid-data]]', 400);
@@ -87,6 +89,7 @@ function post(req, res) {
                 data.title = body.title;
                 data.tags = [];
                 data.thumb = '';
+                data.isAnon = body.isAnon;
                 result = yield queueOrPost(topics_1.default.post, data);
             }
             else {

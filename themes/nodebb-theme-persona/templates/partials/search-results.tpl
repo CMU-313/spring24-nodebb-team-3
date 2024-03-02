@@ -10,7 +10,8 @@
     {{{each posts}}}
     <div class="topic-row panel panel-default clearfix">
         <div class="panel-body">
-            <a href="{config.relative_path}/user/{posts.user.userslug}">{buildAvatar(posts.user, "sm", true)}</a>
+            
+            <a href="{config.relative_path}/user/{posts.user.userslug}">{buildAvatar_post(posts.user, "sm", true, , posts.isAnon)}</a>
             <span class="search-result-text search-result-title"><a href="{config.relative_path}/post/{posts.pid}">{posts.topic.title}</a></span>
             <br/>
             <!-- IF showAsPosts -->

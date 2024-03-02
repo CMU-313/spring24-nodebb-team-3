@@ -1,14 +1,24 @@
 <div class="clearfix post-header">
     <div class="icon pull-left">
-        <a href="<!-- IF posts.user.userslug -->{config.relative_path}/user/{posts.user.userslug}<!-- ELSE -->#<!-- ENDIF posts.user.userslug -->">
-            {buildAvatar(posts.user, "sm2x", true, "", "user/picture")}
-            <i component="user/status" class="fa fa-circle status {posts.user.status}" title="[[global:{posts.user.status}]]"></i>
+        <!-- IF posts.isAnon -->
+            <a href="{config.relative_path}">
+            {buildAvatar_post(posts.user, "sm2x", true, "", "user/picture", true)}
+                <i component="" class="fa fa-circle status Offline" title="[[global:Offline]]"></i>
+        <!-- ELSE -->
+            <a href="{config.relative_path}/user/{posts.user.userslug}">
+            {buildAvatar_post(posts.user, "sm2x", true, "", "user/picture", false)}
+                <i component="user/status" class="fa fa-circle status {posts.user.status}" title="[[global:{posts.user.status}]]"></i>
+        <!-- ENDIF posts.isAnon -->
         </a>
     </div>
 
     <small class="pull-left">
         <strong>
-            <a href="<!-- IF posts.user.userslug -->{config.relative_path}/user/{posts.user.userslug}<!-- ELSE -->#<!-- ENDIF posts.user.userslug -->" itemprop="author" data-username="{posts.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname} ({posts.user.accounttype})</a>
+            <!-- IF posts.isAnon -->
+                <a href="" itemprop="author" data-username="Username" data-uid="{posts.user.uid}">Anonymous Poster</a>
+            <!-- ELSE -->
+                <a href="{config.relative_path}/user/{posts.user.userslug}" itemprop="author" data-username="{post.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname} ({posts.user.accounttype})</a>
+            <!-- ENDIF posts.isAnon -->
         </strong>
 
         <!-- IMPORT partials/topic/badge.tpl -->

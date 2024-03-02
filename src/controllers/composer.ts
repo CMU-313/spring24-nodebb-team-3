@@ -68,6 +68,7 @@ type ComposerData = {
     tags?: string[],
     thumb?: string,
     noscript?: string
+    isAnon?: boolean,
 }
 
 type QueueResult = {
@@ -87,13 +88,13 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
         timestamp: Date.now(),
         content: body.content,
         fromQueue: false,
+        isAnon: body.isAnon,
     };
+    console.assert(typeof data.isAnon === 'boolean', 'Variable data.isAnon is not of right type');
     req.body.noscript = 'true';
-
     if (!data.content) {
         return await helpers.noScriptErrors(req, res, '[[error:invalid-data]]', 400) as Promise<void>;
     }
-
     async function queueOrPost(postFn: PostFnType, data: ComposerData): Promise<QueueResult> {
         // The next line calls a function in a module that has not been updated to TS yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -118,6 +119,7 @@ export async function post(req: Request<object, object, ComposerData> & { uid: n
             data.title = body.title;
             data.tags = [];
             data.thumb = '';
+            data.isAnon = body.isAnon;
             result = await queueOrPost(topics.post as PostFnType, data);
         } else {
             throw new Error('[[error:invalid-data]]');
