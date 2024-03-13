@@ -703,9 +703,9 @@ $(document).ready(function () {
                 return;
             }
 
-            // eslint-disable-next-line no-script-url
             if (
                 hrefEmpty(this.href) ||
+                // eslint-disable-next-line no-script-url
                 this.protocol === 'javascript:' ||
                 href === '#' ||
                 href === ''

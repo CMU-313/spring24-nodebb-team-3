@@ -53,7 +53,7 @@ describe('admin search', () => {
                     'Pellentesque tristique senectus' +
                         '<script>alert("nope");</script> habitant morbi',
                 ),
-                'Pellentesque tristique senectus' + ' habitant morbi',
+                'Pellentesque tristique senectus habitant morbi',
             );
             done();
         });

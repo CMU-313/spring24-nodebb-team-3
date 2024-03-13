@@ -288,14 +288,11 @@ Controllers.robots = function (req, res) {
     if (meta.config['robots:txt']) {
         res.send(meta.config['robots:txt']);
     } else {
-        res.send(
-            `${
-                'User-agent: *\n' + 'Disallow: '
-            }${nconf.get('relative_path')}/admin/\n` +
-                `Disallow: ${nconf.get('relative_path')}/reset/\n` +
-                `Disallow: ${nconf.get('relative_path')}/compose\n` +
-                `Sitemap: ${nconf.get('url')}/sitemap.xml`,
-        );
+        res.send(`${'User-agent: *\n' +
+            'Disallow: '}${nconf.get('relative_path')}/admin/\n` +
+            `Disallow: ${nconf.get('relative_path')}/reset/\n` +
+            `Disallow: ${nconf.get('relative_path')}/compose\n` +
+            `Sitemap: ${nconf.get('url')}/sitemap.xml`);
     }
 };
 
