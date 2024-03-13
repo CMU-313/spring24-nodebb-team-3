@@ -1,29 +1,29 @@
-"use strict";
+'use strict';
 
-const fs = require("fs");
-const path = require("path");
-const winston = require("winston");
-const semver = require("semver");
-const nconf = require("nconf");
-const chalk = require("chalk");
-const request = require("request-promise-native");
+const fs = require('fs');
+const path = require('path');
+const winston = require('winston');
+const semver = require('semver');
+const nconf = require('nconf');
+const chalk = require('chalk');
+const request = require('request-promise-native');
 
-const user = require("../user");
-const posts = require("../posts");
-const meta = require("../meta");
+const user = require('../user');
+const posts = require('../posts');
+const meta = require('../meta');
 
-const { pluginNamePattern, themeNamePattern, paths } = require("../constants");
+const { pluginNamePattern, themeNamePattern, paths } = require('../constants');
 
 let app;
 let middleware;
 
 const Plugins = module.exports;
 
-require("./install")(Plugins);
-require("./load")(Plugins);
-require("./usage")(Plugins);
-Plugins.data = require("./data");
-Plugins.hooks = require("./hooks");
+require('./install')(Plugins);
+require('./load')(Plugins);
+require('./usage')(Plugins);
+Plugins.data = require('./data');
+Plugins.hooks = require('./hooks');
 
 Plugins.getPluginPaths = Plugins.data.getPluginPaths;
 Plugins.loadPluginInfo = Plugins.data.loadPluginInfo;
@@ -83,13 +83,13 @@ Plugins.init = async function (nbbApp, nbbMiddleware) {
         middleware = nbbMiddleware;
     }
 
-    if (global.env === "development") {
-        winston.verbose("[plugins] Initializing plugins system");
+    if (global.env === 'development') {
+        winston.verbose('[plugins] Initializing plugins system');
     }
 
     await Plugins.reload();
-    if (global.env === "development") {
-        winston.info("[plugins] Plugins OK");
+    if (global.env === 'development') {
+        winston.info('[plugins] Plugins OK');
     }
 
     Plugins.initialized = true;
@@ -118,19 +118,19 @@ Plugins.reload = async function () {
     }
 
     // If some plugins are incompatible, throw the warning here
-    if (Plugins.versionWarning.length && nconf.get("isPrimary")) {
-        console.log("");
+    if (Plugins.versionWarning.length && nconf.get('isPrimary')) {
+        console.log('');
         winston.warn(
-            "[plugins/load] The following plugins may not be compatible with your version of NodeBB. This may cause unintended behaviour or crashing. In the event of an unresponsive NodeBB caused by this plugin, run `./nodebb reset -p PLUGINNAME` to disable it.",
+            '[plugins/load] The following plugins may not be compatible with your version of NodeBB. This may cause unintended behaviour or crashing. In the event of an unresponsive NodeBB caused by this plugin, run `./nodebb reset -p PLUGINNAME` to disable it.',
         );
         for (
             let x = 0, numPlugins = Plugins.versionWarning.length;
             x < numPlugins;
             x += 1
         ) {
-            console.log(`${chalk.yellow("  * ") + Plugins.versionWarning[x]}`);
+            console.log(`${chalk.yellow('  * ') + Plugins.versionWarning[x]}`);
         }
-        console.log("");
+        console.log('');
     }
 
     // Core hooks
@@ -143,15 +143,13 @@ Plugins.reload = async function () {
             return;
         }
 
-        const replacement = deprecation.hasOwnProperty("new")
-            ? `Please use ${chalk.yellow(deprecation.new)} instead.`
-            : "There is no alternative.";
+        const replacement = deprecation.hasOwnProperty('new') ?
+            `Please use ${chalk.yellow(deprecation.new)} instead.` :
+            'There is no alternative.';
         winston.warn(
-            `[plugins/load] ${chalk.white.bgRed.bold("DEPRECATION")} The hook ${chalk.yellow(hook)} has been deprecated as of ${deprecation.since}, and slated for removal in ${deprecation.until}. ${replacement} The following plugins are still listening for this hook:`,
+            `[plugins/load] ${chalk.white.bgRed.bold('DEPRECATION')} The hook ${chalk.yellow(hook)} has been deprecated as of ${deprecation.since}, and slated for removal in ${deprecation.until}. ${replacement} The following plugins are still listening for this hook:`,
         );
-        deprecation.affected.forEach((id) =>
-            console.log(`  ${chalk.yellow("*")} ${id}`),
-        );
+        deprecation.affected.forEach(id => console.log(`  ${chalk.yellow('*')} ${id}`));
     });
 
     // Lower priority runs earlier
@@ -164,24 +162,24 @@ Plugins.reload = async function () {
 };
 
 Plugins.reloadRoutes = async function (params) {
-    const controllers = require("../controllers");
-    await Plugins.hooks.fire("static:app.load", {
+    const controllers = require('../controllers');
+    await Plugins.hooks.fire('static:app.load', {
         app: app,
         router: params.router,
         middleware: middleware,
         controllers: controllers,
     });
-    winston.verbose("[plugins] All plugins reloaded and rerouted");
+    winston.verbose('[plugins] All plugins reloaded and rerouted');
 };
 
 Plugins.get = async function (id) {
-    const url = `${nconf.get("registry") || "https://packages.nodebb.org"}/api/v1/plugins/${id}`;
+    const url = `${nconf.get('registry') || 'https://packages.nodebb.org'}/api/v1/plugins/${id}`;
     const body = await request(url, {
         json: true,
     });
 
     let normalised = await Plugins.normalise([body ? body.payload : {}]);
-    normalised = normalised.filter((plugin) => plugin.id === id);
+    normalised = normalised.filter(plugin => plugin.id === id);
     return normalised.length ? normalised[0] : undefined;
 };
 
@@ -190,7 +188,7 @@ Plugins.list = async function (matching) {
         matching = true;
     }
     const { version } = require(paths.currentPackage);
-    const url = `${nconf.get("registry") || "https://packages.nodebb.org"}/api/v1/plugins${matching !== false ? `?version=${version}` : ""}`;
+    const url = `${nconf.get('registry') || 'https://packages.nodebb.org'}/api/v1/plugins${matching !== false ? `?version=${version}` : ''}`;
     try {
         const body = await request(url, {
             json: true,
@@ -203,7 +201,7 @@ Plugins.list = async function (matching) {
 };
 
 Plugins.listTrending = async () => {
-    const url = `${nconf.get("registry") || "https://packages.nodebb.org"}/api/v1/analytics/top/week`;
+    const url = `${nconf.get('registry') || 'https://packages.nodebb.org'}/api/v1/analytics/top/week`;
     return await request(url, {
         json: true,
     });
@@ -219,13 +217,13 @@ Plugins.normalise = async function (apiReturn) {
         packageData.active = false;
         packageData.url =
             packageData.url ||
-            (packageData.repository ? packageData.repository.url : "");
+            (packageData.repository ? packageData.repository.url : '');
         pluginMap[packageData.name] = packageData;
     });
 
     let installedPlugins = await Plugins.showInstalled();
     installedPlugins = installedPlugins.filter(
-        (plugin) => plugin && !plugin.system,
+        plugin => plugin && !plugin.system,
     );
 
     installedPlugins.forEach((plugin) => {
@@ -286,9 +284,7 @@ Plugins.showInstalled = async function () {
     const dirs = await fs.promises.readdir(Plugins.nodeModulesPath);
 
     let pluginPaths = await findNodeBBModules(dirs);
-    pluginPaths = pluginPaths.map((dir) =>
-        path.join(Plugins.nodeModulesPath, dir),
-    );
+    pluginPaths = pluginPaths.map(dir => path.join(Plugins.nodeModulesPath, dir));
 
     async function load(file) {
         try {
@@ -304,7 +300,7 @@ Plugins.showInstalled = async function () {
             winston.error(err.stack);
         }
     }
-    const plugins = await Promise.all(pluginPaths.map((file) => load(file)));
+    const plugins = await Promise.all(pluginPaths.map(file => load(file)));
     return plugins.filter(Boolean);
 };
 
@@ -322,7 +318,7 @@ async function findNodeBBModules(dirs) {
                 return;
             }
 
-            if (dirname[0] === "@") {
+            if (dirname[0] === '@') {
                 const subdirs = await fs.promises.readdir(dirPath);
                 await Promise.all(
                     subdirs.map(async (subdir) => {
@@ -348,11 +344,11 @@ async function isDirectory(dirPath) {
         const stats = await fs.promises.stat(dirPath);
         return stats.isDirectory();
     } catch (err) {
-        if (err.code !== "ENOENT") {
+        if (err.code !== 'ENOENT') {
             throw err;
         }
         return false;
     }
 }
 
-require("../promisify")(Plugins);
+require('../promisify')(Plugins);

@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
-const user = require("../user");
+const db = require('../database');
+const user = require('../user');
 
 module.exports = function (Categories) {
     Categories.watchStates = {
@@ -15,7 +15,7 @@ module.exports = function (Categories) {
             return cids.map(() => false);
         }
         const states = await Categories.getWatchState(cids, uid);
-        return states.map((state) => state === Categories.watchStates.ignoring);
+        return states.map(state => state === Categories.watchStates.ignoring);
     };
 
     Categories.getWatchState = async function (cids, uid) {
@@ -25,14 +25,13 @@ module.exports = function (Categories) {
         if (!Array.isArray(cids) || !cids.length) {
             return [];
         }
-        const keys = cids.map((cid) => `cid:${cid}:uid:watch:state`);
+        const keys = cids.map(cid => `cid:${cid}:uid:watch:state`);
         const [userSettings, states] = await Promise.all([
             user.getSettings(uid),
             db.sortedSetsScore(keys, uid),
         ]);
         return states.map(
-            (state) =>
-                state ||
+            state => state ||
                 Categories.watchStates[userSettings.categoryWatchState],
         );
     };
@@ -51,8 +50,7 @@ module.exports = function (Categories) {
     Categories.filterIgnoringUids = async function (cid, uids) {
         const states = await Categories.getUidsWatchStates(cid, uids);
         const readingUids = uids.filter(
-            (uid, index) =>
-                uid && states[index] !== Categories.watchStates.ignoring,
+            (uid, index) => uid && states[index] !== Categories.watchStates.ignoring,
         );
         return readingUids;
     };
@@ -63,8 +61,7 @@ module.exports = function (Categories) {
             db.sortedSetScores(`cid:${cid}:uid:watch:state`, uids),
         ]);
         return states.map(
-            (state, index) =>
-                state ||
+            (state, index) => state ||
                 Categories.watchStates[userSettings[index].categoryWatchState],
         );
     };

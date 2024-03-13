@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
-const db = require("../database");
-const user = require("../user");
-const cache = require("../cache");
+const db = require('../database');
+const user = require('../user');
+const cache = require('../cache');
 
 module.exports = function (Groups) {
     Groups.getMembers = async function (groupName, start, stop) {
@@ -19,18 +19,18 @@ module.exports = function (Groups) {
         async function get(groupName) {
             const uids = await Groups.getMembers(groupName, start, stop);
             return await user.getUsersFields(uids, [
-                "uid",
-                "username",
-                "picture",
-                "userslug",
+                'uid',
+                'username',
+                'picture',
+                'userslug',
             ]);
         }
-        return await Promise.all(groupNames.map((name) => get(name)));
+        return await Promise.all(groupNames.map(name => get(name)));
     };
 
     Groups.getMembersOfGroups = async function (groupNames) {
         return await db.getSortedSetsMembers(
-            groupNames.map((name) => `group:${name}:members`),
+            groupNames.map(name => `group:${name}:members`),
         );
     };
 
@@ -57,17 +57,15 @@ module.exports = function (Groups) {
             return uids.map(() => false);
         }
 
-        if (groupName === "guests") {
-            return uids.map((uid) => parseInt(uid, 10) === 0);
+        if (groupName === 'guests') {
+            return uids.map(uid => parseInt(uid, 10) === 0);
         }
 
         const cachedData = {};
-        const nonCachedUids = uids.filter((uid) =>
-            filterNonCached(cachedData, uid, groupName),
-        );
+        const nonCachedUids = uids.filter(uid => filterNonCached(cachedData, uid, groupName));
 
         if (!nonCachedUids.length) {
-            return uids.map((uid) => cachedData[`${uid}:${groupName}`]);
+            return uids.map(uid => cachedData[`${uid}:${groupName}`]);
         }
 
         const isMembers = await db.isSortedSetMembers(
@@ -78,23 +76,21 @@ module.exports = function (Groups) {
             cachedData[`${uid}:${groupName}`] = isMembers[index];
             Groups.cache.set(`${uid}:${groupName}`, isMembers[index]);
         });
-        return uids.map((uid) => cachedData[`${uid}:${groupName}`]);
+        return uids.map(uid => cachedData[`${uid}:${groupName}`]);
     };
 
     Groups.isMemberOfGroups = async function (uid, groups) {
         if (!uid || parseInt(uid, 10) <= 0 || !groups.length) {
-            return groups.map((groupName) => groupName === "guests");
+            return groups.map(groupName => groupName === 'guests');
         }
         const cachedData = {};
-        const nonCachedGroups = groups.filter((groupName) =>
-            filterNonCached(cachedData, uid, groupName),
-        );
+        const nonCachedGroups = groups.filter(groupName => filterNonCached(cachedData, uid, groupName));
 
         if (!nonCachedGroups.length) {
-            return groups.map((groupName) => cachedData[`${uid}:${groupName}`]);
+            return groups.map(groupName => cachedData[`${uid}:${groupName}`]);
         }
         const nonCachedGroupsMemberSets = nonCachedGroups.map(
-            (groupName) => `group:${groupName}:members`,
+            groupName => `group:${groupName}:members`,
         );
         const isMembers = await db.isMemberOfSortedSets(
             nonCachedGroupsMemberSets,
@@ -105,7 +101,7 @@ module.exports = function (Groups) {
             Groups.cache.set(`${uid}:${groupName}`, isMembers[index]);
         });
 
-        return groups.map((groupName) => cachedData[`${uid}:${groupName}`]);
+        return groups.map(groupName => cachedData[`${uid}:${groupName}`]);
     };
 
     function filterNonCached(cachedData, uid, groupName) {
@@ -128,7 +124,7 @@ module.exports = function (Groups) {
     Groups.getMemberCount = async function (groupName) {
         const count = await db.getObjectField(
             `group:${groupName}`,
-            "memberCount",
+            'memberCount',
         );
         return parseInt(count, 10);
     };
@@ -154,7 +150,7 @@ module.exports = function (Groups) {
         const isGroupMember = _.zipObject(uniqueGroups, isMembers);
 
         return members.map(
-            (groupNames) => !!groupNames.find((name) => isGroupMember[name]),
+            groupNames => !!groupNames.find(name => isGroupMember[name]),
         );
     };
 
@@ -167,7 +163,7 @@ module.exports = function (Groups) {
             return results;
         }
         const isGroupMembers = await Promise.all(
-            groupNames.map((name) => Groups.isMembers(uids, name)),
+            groupNames.map(name => Groups.isMembers(uids, name)),
         );
 
         isGroupMembers.forEach((isMembers) => {
@@ -195,20 +191,20 @@ module.exports = function (Groups) {
         });
 
         if (!nonCachedKeys.length) {
-            return isArray
-                ? keys.map((groupName) => cachedData[groupName])
-                : cachedData[keys[0]];
+            return isArray ?
+                keys.map(groupName => cachedData[groupName]) :
+                cachedData[keys[0]];
         }
         const groupMembers = await db.getSortedSetsMembers(
-            nonCachedKeys.map((name) => `group:${name}:members`),
+            nonCachedKeys.map(name => `group:${name}:members`),
         );
 
         nonCachedKeys.forEach((groupName, index) => {
             cachedData[groupName] = groupMembers[index];
             cache.set(`group:${groupName}:members`, groupMembers[index]);
         });
-        return isArray
-            ? keys.map((groupName) => cachedData[groupName])
-            : cachedData[keys[0]];
+        return isArray ?
+            keys.map(groupName => cachedData[groupName]) :
+            cachedData[keys[0]];
     }
 };

@@ -1,42 +1,41 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
-const meta = require("../meta");
-const plugins = require("../plugins");
-const db = require("../database");
-const groups = require("../groups");
-const utils = require("../utils");
+const meta = require('../meta');
+const plugins = require('../plugins');
+const db = require('../database');
+const groups = require('../groups');
+const utils = require('../utils');
 
 module.exports = function (User) {
     const filterFnMap = {
-        online: (user) =>
-            user.status !== "offline" && Date.now() - user.lastonline < 300000,
-        flagged: (user) => parseInt(user.flags, 10) > 0,
-        verified: (user) => !!user["email:confirmed"],
-        unverified: (user) => !user["email:confirmed"],
+        online: user => user.status !== 'offline' && Date.now() - user.lastonline < 300000,
+        flagged: user => parseInt(user.flags, 10) > 0,
+        verified: user => !!user['email:confirmed'],
+        unverified: user => !user['email:confirmed'],
     };
 
     const filterFieldMap = {
-        online: ["status", "lastonline"],
-        flagged: ["flags"],
-        verified: ["email:confirmed"],
-        unverified: ["email:confirmed"],
+        online: ['status', 'lastonline'],
+        flagged: ['flags'],
+        verified: ['email:confirmed'],
+        unverified: ['email:confirmed'],
     };
 
     User.search = async function (data) {
-        const query = data.query || "";
-        const searchBy = data.searchBy || "username";
+        const query = data.query || '';
+        const searchBy = data.searchBy || 'username';
         const page = data.page || 1;
         const uid = data.uid || 0;
-        const paginate = data.hasOwnProperty("paginate") ? data.paginate : true;
+        const paginate = data.hasOwnProperty('paginate') ? data.paginate : true;
 
         const startTime = process.hrtime();
 
         let uids = [];
-        if (searchBy === "ip") {
+        if (searchBy === 'ip') {
             uids = await searchByIP(query);
-        } else if (searchBy === "uid") {
+        } else if (searchBy === 'uid') {
             uids = [query];
         } else {
             const searchMethod = data.findUids || findUids;
@@ -44,7 +43,7 @@ module.exports = function (User) {
         }
 
         uids = await filterAndSortUids(uids, data);
-        const result = await plugins.hooks.fire("filter:users.search", {
+        const result = await plugins.hooks.fire('filter:users.search', {
             uids: uids,
             uid: uid,
         });
@@ -67,7 +66,7 @@ module.exports = function (User) {
         searchResult.timing = (
             process.elapsedTimeSince(startTime) / 1000
         ).toFixed(2);
-        searchResult.users = userData.filter((user) => user && user.uid > 0);
+        searchResult.users = userData.filter(user => user && user.uid > 0);
         return searchResult;
     };
 
@@ -91,12 +90,12 @@ module.exports = function (User) {
             0,
             hardCap,
         );
-        const uids = data.map((data) => data.split(":").pop());
+        const uids = data.map(data => data.split(':').pop());
         return uids;
     }
 
     async function filterAndSortUids(uids, data) {
-        uids = uids.filter((uid) => parseInt(uid, 10));
+        uids = uids.filter(uid => parseInt(uid, 10));
         let filters = data.filters || [];
         filters = Array.isArray(filters) ? filters : [data.filters];
         const fields = [];
@@ -120,20 +119,18 @@ module.exports = function (User) {
             return uids;
         }
 
-        if (filters.includes("banned") || filters.includes("notbanned")) {
+        if (filters.includes('banned') || filters.includes('notbanned')) {
             const isMembersOfBanned = await groups.isMembers(
                 uids,
                 groups.BANNED_USERS,
             );
-            const checkBanned = filters.includes("banned");
-            uids = uids.filter((uid, index) =>
-                checkBanned
-                    ? isMembersOfBanned[index]
-                    : !isMembersOfBanned[index],
-            );
+            const checkBanned = filters.includes('banned');
+            uids = uids.filter((uid, index) => (checkBanned ?
+                isMembersOfBanned[index] :
+                !isMembersOfBanned[index]));
         }
 
-        fields.push("uid");
+        fields.push('uid');
         let userData = await User.getUsersFields(uids, fields);
 
         filters.forEach((filter) => {
@@ -146,15 +143,15 @@ module.exports = function (User) {
             sortUsers(userData, data.sortBy, data.sortDirection);
         }
 
-        return userData.map((user) => user.uid);
+        return userData.map(user => user.uid);
     }
 
     function sortUsers(userData, sortBy, sortDirection) {
         if (!userData || !userData.length) {
             return;
         }
-        sortDirection = sortDirection || "desc";
-        const direction = sortDirection === "desc" ? 1 : -1;
+        sortDirection = sortDirection || 'desc';
+        const direction = sortDirection === 'desc' ? 1 : -1;
 
         const isNumeric = utils.isNumber(userData[0][sortBy]);
         if (isNumeric) {

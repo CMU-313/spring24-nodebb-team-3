@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const plugins = require("../plugins");
-const slugify = require("../slugify");
-const db = require("../database");
-const batch = require("../batch");
+const plugins = require('../plugins');
+const slugify = require('../slugify');
+const db = require('../database');
+const batch = require('../batch');
 
 module.exports = function (Groups) {
     Groups.destroy = async function (groupNames) {
@@ -28,37 +28,35 @@ module.exports = function (Groups) {
             );
         });
         const sets = groupNames.map(
-            (groupName) => `${groupName.toLowerCase()}:${groupName}`,
+            groupName => `${groupName.toLowerCase()}:${groupName}`,
         );
-        const fields = groupNames.map((groupName) => slugify(groupName));
+        const fields = groupNames.map(groupName => slugify(groupName));
 
         await Promise.all([
             db.deleteAll(keys),
             db.sortedSetRemove(
                 [
-                    "groups:createtime",
-                    "groups:visible:createtime",
-                    "groups:visible:memberCount",
+                    'groups:createtime',
+                    'groups:visible:createtime',
+                    'groups:visible:memberCount',
                 ],
                 groupNames,
             ),
-            db.sortedSetRemove("groups:visible:name", sets),
-            db.deleteObjectFields("groupslug:groupname", fields),
+            db.sortedSetRemove('groups:visible:name', sets),
+            db.deleteObjectFields('groupslug:groupname', fields),
             removeGroupsFromPrivilegeGroups(groupNames),
         ]);
         Groups.cache.reset();
-        plugins.hooks.fire("action:groups.destroy", { groups: groupsData });
+        plugins.hooks.fire('action:groups.destroy', { groups: groupsData });
     };
 
     async function removeGroupsFromPrivilegeGroups(groupNames) {
         await batch.processSortedSet(
-            "groups:createtime",
+            'groups:createtime',
             async (otherGroups) => {
-                const privilegeGroups = otherGroups.filter((group) =>
-                    Groups.isPrivilegeGroup(group),
-                );
+                const privilegeGroups = otherGroups.filter(group => Groups.isPrivilegeGroup(group));
                 const keys = privilegeGroups.map(
-                    (group) => `group:${group}:members`,
+                    group => `group:${group}:members`,
                 );
                 await db.sortedSetRemove(keys, groupNames);
             },

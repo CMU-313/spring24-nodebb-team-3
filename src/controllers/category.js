@@ -1,32 +1,32 @@
-"use strict";
+'use strict';
 
-const nconf = require("nconf");
-const validator = require("validator");
-const qs = require("querystring");
+const nconf = require('nconf');
+const validator = require('validator');
+const qs = require('querystring');
 
-const db = require("../database");
-const privileges = require("../privileges");
-const user = require("../user");
-const categories = require("../categories");
-const meta = require("../meta");
-const pagination = require("../pagination");
-const helpers = require("./helpers");
-const utils = require("../utils");
-const translator = require("../translator");
-const analytics = require("../analytics");
+const db = require('../database');
+const privileges = require('../privileges');
+const user = require('../user');
+const categories = require('../categories');
+const meta = require('../meta');
+const pagination = require('../pagination');
+const helpers = require('./helpers');
+const utils = require('../utils');
+const translator = require('../translator');
+const analytics = require('../analytics');
 
 const categoryController = module.exports;
 
-const url = nconf.get("url");
-const relative_path = nconf.get("relative_path");
+const url = nconf.get('url');
+const relative_path = nconf.get('relative_path');
 
 categoryController.get = async function (req, res, next) {
     const cid = req.params.category_id;
 
     let currentPage = parseInt(req.query.page, 10) || 1;
-    let topicIndex = utils.isNumber(req.params.topic_index)
-        ? parseInt(req.params.topic_index, 10) - 1
-        : 0;
+    let topicIndex = utils.isNumber(req.params.topic_index) ?
+        parseInt(req.params.topic_index, 10) - 1 :
+        0;
     if (
         (req.params.topic_index && !utils.isNumber(req.params.topic_index)) ||
         !utils.isNumber(cid)
@@ -36,7 +36,7 @@ categoryController.get = async function (req, res, next) {
 
     const [categoryFields, userPrivileges, userSettings, rssToken] =
         await Promise.all([
-            categories.getCategoryFields(cid, ["slug", "disabled", "link"]),
+            categories.getCategoryFields(cid, ['slug', 'disabled', 'link']),
             privileges.categories.get(cid, req.uid),
             user.getSettings(req.uid),
             user.auth.getFeedToken(req.uid),
@@ -74,7 +74,7 @@ categoryController.get = async function (req, res, next) {
     }
 
     if (categoryFields.link) {
-        await db.incrObjectField(`category:${cid}`, "timesClicked");
+        await db.incrObjectField(`category:${cid}`, 'timesClicked');
         return helpers.redirect(res, validator.unescape(categoryFields.link));
     }
 
@@ -157,7 +157,7 @@ categoryController.get = async function (req, res, next) {
     }
 
     categoryData.title = translator.escape(categoryData.name);
-    categoryData.selectCategoryLabel = "[[category:subcategories]]";
+    categoryData.selectCategoryLabel = '[[category:subcategories]]';
     categoryData.description = translator.escape(categoryData.description);
     categoryData.privileges = userPrivileges;
     categoryData.showSelect = userPrivileges.editable;
@@ -171,8 +171,8 @@ categoryController.get = async function (req, res, next) {
 
     addTags(categoryData, res);
 
-    categoryData["feeds:disableRSS"] = meta.config["feeds:disableRSS"] || 0;
-    categoryData["reputation:disabled"] = meta.config["reputation:disabled"];
+    categoryData['feeds:disableRSS'] = meta.config['feeds:disableRSS'] || 0;
+    categoryData['reputation:disabled'] = meta.config['reputation:disabled'];
     categoryData.pagination = pagination.create(
         currentPage,
         pageCount,
@@ -185,7 +185,7 @@ categoryController.get = async function (req, res, next) {
 
     analytics.increment([`pageviews:byCid:${categoryData.cid}`]);
 
-    res.render("category", categoryData);
+    res.render('category', categoryData);
 };
 
 async function buildBreadcrumbs(req, categoryData) {
@@ -210,47 +210,47 @@ async function buildBreadcrumbs(req, categoryData) {
 function addTags(categoryData, res) {
     res.locals.metaTags = [
         {
-            name: "title",
+            name: 'title',
             content: categoryData.name,
             noEscape: true,
         },
         {
-            property: "og:title",
+            property: 'og:title',
             content: categoryData.name,
             noEscape: true,
         },
         {
-            name: "description",
+            name: 'description',
             content: categoryData.description,
             noEscape: true,
         },
         {
-            property: "og:type",
-            content: "website",
+            property: 'og:type',
+            content: 'website',
         },
     ];
 
     if (categoryData.backgroundImage) {
-        if (!categoryData.backgroundImage.startsWith("http")) {
+        if (!categoryData.backgroundImage.startsWith('http')) {
             categoryData.backgroundImage = url + categoryData.backgroundImage;
         }
         res.locals.metaTags.push({
-            property: "og:image",
+            property: 'og:image',
             content: categoryData.backgroundImage,
         });
     }
 
     res.locals.linkTags = [
         {
-            rel: "up",
+            rel: 'up',
             href: url,
         },
     ];
 
-    if (!categoryData["feeds:disableRSS"]) {
+    if (!categoryData['feeds:disableRSS']) {
         res.locals.linkTags.push({
-            rel: "alternate",
-            type: "application/rss+xml",
+            rel: 'alternate',
+            type: 'application/rss+xml',
             href: categoryData.rssFeedUrl,
         });
     }

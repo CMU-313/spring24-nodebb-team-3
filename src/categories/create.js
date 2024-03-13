@@ -1,20 +1,20 @@
-"use strict";
+'use strict';
 
-const async = require("async");
-const _ = require("lodash");
+const async = require('async');
+const _ = require('lodash');
 
-const db = require("../database");
-const plugins = require("../plugins");
-const privileges = require("../privileges");
-const utils = require("../utils");
-const slugify = require("../slugify");
-const cache = require("../cache");
+const db = require('../database');
+const plugins = require('../plugins');
+const privileges = require('../privileges');
+const utils = require('../utils');
+const slugify = require('../slugify');
+const cache = require('../cache');
 
 module.exports = function (Categories) {
     Categories.create = async function (data) {
         const parentCid = data.parentCid ? data.parentCid : 0;
         const [cid, firstChild] = await Promise.all([
-            db.incrObjectField("global", "nextCid"),
+            db.incrObjectField('global', 'nextCid'),
             db.getSortedSetRangeWithScores(`cid:${parentCid}:children`, 0, 0),
         ]);
 
@@ -27,11 +27,11 @@ module.exports = function (Categories) {
         let category = {
             cid: cid,
             name: data.name,
-            description: data.description ? data.description : "",
-            descriptionParsed: data.descriptionParsed
-                ? data.descriptionParsed
-                : "",
-            icon: data.icon ? data.icon : "",
+            description: data.description ? data.description : '',
+            descriptionParsed: data.descriptionParsed ?
+                data.descriptionParsed :
+                '',
+            icon: data.icon ? data.icon : '',
             bgColor: data.bgColor || colours[0],
             color: data.color || colours[1],
             slug: slug,
@@ -40,10 +40,10 @@ module.exports = function (Categories) {
             post_count: 0,
             disabled: data.disabled ? 1 : 0,
             order: order,
-            link: data.link || "",
+            link: data.link || '',
             numRecentReplies: 1,
-            class: data.class ? data.class : "col-md-3 col-xs-6",
-            imageClass: "cover",
+            class: data.class ? data.class : 'col-md-3 col-xs-6',
+            imageClass: 'cover',
             isSection: 0,
             subCategoriesPerPage: 10,
         };
@@ -53,31 +53,31 @@ module.exports = function (Categories) {
         }
 
         const defaultPrivileges = [
-            "groups:find",
-            "groups:read",
-            "groups:topics:read",
-            "groups:topics:create",
-            "groups:topics:reply",
-            "groups:topics:tag",
-            "groups:posts:edit",
-            "groups:posts:history",
-            "groups:posts:delete",
-            "groups:posts:upvote",
-            "groups:posts:downvote",
-            "groups:topics:delete",
+            'groups:find',
+            'groups:read',
+            'groups:topics:read',
+            'groups:topics:create',
+            'groups:topics:reply',
+            'groups:topics:tag',
+            'groups:posts:edit',
+            'groups:posts:history',
+            'groups:posts:delete',
+            'groups:posts:upvote',
+            'groups:posts:downvote',
+            'groups:topics:delete',
         ];
         const modPrivileges = defaultPrivileges.concat([
-            "groups:topics:schedule",
-            "groups:posts:view_deleted",
-            "groups:purge",
+            'groups:topics:schedule',
+            'groups:posts:view_deleted',
+            'groups:purge',
         ]);
         const guestPrivileges = [
-            "groups:find",
-            "groups:read",
-            "groups:topics:read",
+            'groups:find',
+            'groups:read',
+            'groups:topics:read',
         ];
 
-        const result = await plugins.hooks.fire("filter:category.create", {
+        const result = await plugins.hooks.fire('filter:category.create', {
             category: category,
             data: data,
             defaultPrivileges: defaultPrivileges,
@@ -95,10 +95,10 @@ module.exports = function (Categories) {
         }
 
         await db.sortedSetAddBulk([
-            ["categories:cid", category.order, category.cid],
+            ['categories:cid', category.order, category.cid],
             [`cid:${parentCid}:children`, category.order, category.cid],
             [
-                "categories:name",
+                'categories:name',
                 0,
                 `${data.name.slice(0, 200).toLowerCase()}:${category.cid}`,
             ],
@@ -107,19 +107,19 @@ module.exports = function (Categories) {
         await privileges.categories.give(
             result.defaultPrivileges,
             category.cid,
-            "registered-users",
+            'registered-users',
         );
         await privileges.categories.give(result.modPrivileges, category.cid, [
-            "administrators",
-            "Global Moderators",
+            'administrators',
+            'Global Moderators',
         ]);
         await privileges.categories.give(result.guestPrivileges, category.cid, [
-            "guests",
-            "spiders",
+            'guests',
+            'spiders',
         ]);
 
         cache.del([
-            "categories:cid",
+            'categories:cid',
             `cid:${parentCid}:children`,
             `cid:${parentCid}:children:all`,
         ]);
@@ -139,7 +139,7 @@ module.exports = function (Categories) {
             );
         }
 
-        plugins.hooks.fire("action:category.create", { category: category });
+        plugins.hooks.fire('action:category.create', { category: category });
         return category;
     };
 
@@ -165,24 +165,24 @@ module.exports = function (Categories) {
 
     Categories.assignColours = function () {
         const backgrounds = [
-            "#AB4642",
-            "#DC9656",
-            "#F7CA88",
-            "#A1B56C",
-            "#86C1B9",
-            "#7CAFC2",
-            "#BA8BAF",
-            "#A16946",
+            '#AB4642',
+            '#DC9656',
+            '#F7CA88',
+            '#A1B56C',
+            '#86C1B9',
+            '#7CAFC2',
+            '#BA8BAF',
+            '#A16946',
         ];
         const text = [
-            "#ffffff",
-            "#ffffff",
-            "#333333",
-            "#ffffff",
-            "#333333",
-            "#ffffff",
-            "#ffffff",
-            "#ffffff",
+            '#ffffff',
+            '#ffffff',
+            '#333333',
+            '#ffffff',
+            '#333333',
+            '#ffffff',
+            '#ffffff',
+            '#ffffff',
         ];
         const index = Math.floor(Math.random() * backgrounds.length);
         return [backgrounds[index], text[index]];
@@ -194,7 +194,7 @@ module.exports = function (Categories) {
             db.getObject(`category:${toCid}`),
         ]);
         if (!source) {
-            throw new Error("[[error:invalid-cid]]");
+            throw new Error('[[error:invalid-cid]]');
         }
 
         const oldParent = parseInt(destination.parentCid, 10) || 0;
@@ -230,7 +230,7 @@ module.exports = function (Categories) {
         if (copyParent) {
             destination.parentCid = source.parentCid || 0;
         }
-        await plugins.hooks.fire("filter:categories.copySettingsFrom", {
+        await plugins.hooks.fire('filter:categories.copySettingsFrom', {
             source: source,
             destination: destination,
             copyParent: copyParent,
@@ -254,8 +254,8 @@ module.exports = function (Categories) {
         await db.delete(`cid:${toCid}:tag:whitelist`);
         await db.sortedSetAdd(
             `cid:${toCid}:tag:whitelist`,
-            data.map((item) => item.score),
-            data.map((item) => item.value),
+            data.map(item => item.score),
+            data.map(item => item.value),
         );
         cache.del(`cid:${toCid}:tag:whitelist`);
     }
@@ -266,7 +266,7 @@ module.exports = function (Categories) {
         group,
         filter = [],
     ) {
-        group = group || "";
+        group = group || '';
         let privsToCopy;
         if (group) {
             const groupPrivilegeList =
@@ -282,7 +282,7 @@ module.exports = function (Categories) {
         }
 
         const data = await plugins.hooks.fire(
-            "filter:categories.copyPrivilegesFrom",
+            'filter:categories.copyPrivilegesFrom',
             {
                 privileges: privsToCopy,
                 fromCid: fromCid,
@@ -304,11 +304,10 @@ module.exports = function (Categories) {
 
     async function copyPrivileges(privileges, fromCid, toCid) {
         const toGroups = privileges.map(
-            (privilege) => `group:cid:${toCid}:privileges:${privilege}:members`,
+            privilege => `group:cid:${toCid}:privileges:${privilege}:members`,
         );
         const fromGroups = privileges.map(
-            (privilege) =>
-                `group:cid:${fromCid}:privileges:${privilege}:members`,
+            privilege => `group:cid:${fromCid}:privileges:${privilege}:members`,
         );
 
         const currentMembers = await db.getSortedSetsMembers(
@@ -322,11 +321,10 @@ module.exports = function (Categories) {
 
     async function copyPrivilegesByGroup(privilegeList, fromCid, toCid, group) {
         const fromGroups = privilegeList.map(
-            (privilege) =>
-                `group:cid:${fromCid}:privileges:${privilege}:members`,
+            privilege => `group:cid:${fromCid}:privileges:${privilege}:members`,
         );
         const toGroups = privilegeList.map(
-            (privilege) => `group:cid:${toCid}:privileges:${privilege}:members`,
+            privilege => `group:cid:${toCid}:privileges:${privilege}:members`,
         );
         const [fromChecks, toChecks] = await Promise.all([
             db.isMemberOfSortedSets(fromGroups, group),
