@@ -1253,3 +1253,30 @@ describe('Posts\'', async () => {
         });
     });
 });
+
+describe('Latex posting', () => {
+
+    it('single $ regex renders -> mathml', () => {
+        const i = { content: '$\\x = 1$' };
+
+        const callback = (error, postData) => {
+            assert.ifError(error);
+            const o = '<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\\x = 1</annotation></semantics></math></span>';
+            assert.equal(postData.content, o);
+        };
+
+        posts.renderLatex(i, callback);
+    });
+
+    it('double $ regex renders -> mathml', () => {
+        const i = { content: '$$\\x = 1$$' };
+
+        const callback = (error, postData) => {
+            assert.ifError(error);
+            const o = '<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\\x = 1</annotation></semantics></math></span>';
+            assert.equal(postData.content, o);
+        };
+
+        posts.renderLatex(i, callback);
+    });
+});
