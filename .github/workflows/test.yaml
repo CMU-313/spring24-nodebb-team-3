@@ -175,16 +175,16 @@ jobs:
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
 
+      - name: Stryker Mutation tests
+        run: npx stryker run
+        env:
+          CONFIG_FILE: stryker.config.json
+
       - name: Node tests
         run: npm test
 
       - name: Extract coverage info
         run: npm run coverage
-
-      - name: Stryker Mutation tests
-        run: npm run test:mutation
-        env:
-          CONFIG_FILE: stryker.config.json
 
       - name: Test coverage
         uses: coverallsapp/github-action@1.1.3
@@ -193,8 +193,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           flag-name: ${{ matrix.os }}-node-${{ matrix.node }}-db-${{ matrix.database }}
           parallel: true
-
-
 
   finish:
     permissions:
