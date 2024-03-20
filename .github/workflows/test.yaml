@@ -182,7 +182,9 @@ jobs:
         run: npm run coverage
 
       - name: Stryker Mutation tests
-        run: npx stryker run
+        run: npm run test:mutation
+        env:
+          CONFIG_FILE: stryker.config.json
 
       - name: Test coverage
         uses: coverallsapp/github-action@1.1.3
