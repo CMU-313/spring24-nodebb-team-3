@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - stryker
   pull_request:
     branches:
       - main
@@ -180,6 +181,9 @@ jobs:
       - name: Extract coverage info
         run: npm run coverage
 
+      - name: Stryker Mutation tests
+        run: npx stryker run
+
       - name: Test coverage
         uses: coverallsapp/github-action@1.1.3
         if: matrix.coverage
@@ -188,8 +192,7 @@ jobs:
           flag-name: ${{ matrix.os }}-node-${{ matrix.node }}-db-${{ matrix.database }}
           parallel: true
 
-      - name: Stryker Mutation tests
-        run: npx stryker run
+
 
   finish:
     permissions:
