@@ -175,12 +175,6 @@ jobs:
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
 
-      - name: Stryker Mutation tests
-        run: npx stryker run
-        with:
-          config-file: stryker.config.json
-          
-
       - name: Node tests
         run: npm test
 
@@ -194,6 +188,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           flag-name: ${{ matrix.os }}-node-${{ matrix.node }}-db-${{ matrix.database }}
           parallel: true
+
+      - name: Stryker Mutation tests
+        run: npm run test:mutation -- --reporters progress,dashboard
+        env:
+          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
 
   finish:
     permissions:
