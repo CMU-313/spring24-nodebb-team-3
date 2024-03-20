@@ -175,6 +175,15 @@ jobs:
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
 
+      - name: Install & Build
+        run: |
+          npm install
+          npm run build
+      - name: Run Stryker
+        run: npx lerna run --scope "@stryker-mutator/core" --concurrency 1 --stream stryker -- --concurrency 3
+        env:
+          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
+
       - name: Node tests
         run: npm test
 
