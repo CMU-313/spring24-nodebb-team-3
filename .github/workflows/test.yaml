@@ -176,7 +176,10 @@ jobs:
           node app --setup="${SETUP}" --ci="${CI}"
 
       - name: Stryker Mutation tests
-        run: npx stryker run -- --config-file stryker.config.json
+        run: npx stryker run
+        with:
+          config-file: stryker.config.json
+          
 
       - name: Node tests
         run: npm test
