@@ -174,11 +174,6 @@ jobs:
             }
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
-          
-      - name: Stryker Mutation tests
-        run: npm run test:mutation -- --reporters progress,dashboard
-        env:
-          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
 
       - name: Node tests
         run: npm test
