@@ -67,7 +67,7 @@ coverage
 test/files/normalise.jpg.png
 test/files/normalise-resized.jpg
 package-lock.json
-/package.json
+# /package.json
 *.mongodb
 link-plugins.sh
 test.sh
@@ -82,3 +82,6 @@ theme/*.sublime-workspace
 theme/.idea
 theme/.vscode
 theme/node_modules/
+
+# stryker temp files
+.stryker-tmp
