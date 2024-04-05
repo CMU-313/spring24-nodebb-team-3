@@ -52,7 +52,6 @@ function saveDatabaseConfig(config, databaseConfig) {
             password: databaseConfig['redis:password'],
             database: databaseConfig['redis:database'],
         };
-
         if (config.redis.host.slice(0, 1) === '/') {
             delete config.redis.port;
         }
