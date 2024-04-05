@@ -6,7 +6,6 @@ const meta = require('../meta');
 
 let versionCache = '';
 let versionCacheLastModified = '';
-
 const isPrerelease = /^v?\d+\.\d+\.\d+-.+$/;
 
 function getLatestVersion(callback) {
