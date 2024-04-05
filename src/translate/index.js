@@ -7,7 +7,7 @@ const translatorApi = module.exports;
 
 translatorApi.translate = async function (postData) {
     const response = await fetch(
-        "https://translator-service-kyyxofu25q-uc.a.run.app" +
+        "https://translator-service-lid2ggn5va-uc.a.run.app/" +
             "/?content=" +
             postData.content,
     );
