@@ -317,7 +317,7 @@ describe('User', () => {
                     cid: testCid,
                 }),
             ], (err) => {
-                // assert(err);
+                assert(err);
                 done();
             });
         });
