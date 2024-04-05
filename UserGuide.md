@@ -2,13 +2,13 @@
 
 ## Teacher/Student Indication
 
-- This new feature will automatically be applied to any posts or replies on the website. Depending on the account type of a user (student/instructor), there will be an indication written next to their username, as well as a colored text box surrounding their posts/replies. 
-- To user test this new feature, try creating new accounts of the student/instructor type, and making any post or reply. 
-- Additional automated tests, as well as improvements to existing tests can be found inside the test/user.js file. 
-- The two edited functions getUserData and getUserFields are tested in these tests. 
-- Two tests are added for getUserFields, to ensure the accounttype and isStudent fields are properly saved whenever a user is created, which was previously untested. 
-- Additional type checks are added for getUserData. 
-- These changes are sufficient for ensuring the necessary data is passed to the post.tpl file. 
+- This new feature will automatically be applied to any posts or replies on the website. Depending on the account type of a user (student/instructor), there will be an indication written next to their username, as well as a colored text box surrounding their posts/replies.
+- To user test this new feature, try creating new accounts of the student/instructor type, and making any post or reply.
+- Additional automated tests, as well as improvements to existing tests can be found inside the test/user.js file.
+- The two edited functions getUserData and getUserFields are tested in these tests.
+- Two tests are added for getUserFields, to ensure the accounttype and isStudent fields are properly saved whenever a user is created, which was previously untested.
+- Additional type checks are added for getUserData.
+- These changes are sufficient for ensuring the necessary data is passed to the post.tpl file.
 
 ## Some Votes Count More
 
@@ -24,11 +24,10 @@
 - This functionality was previously not tested, and I orchestrated a post and reply in the test.
 - Additional type checks are added for the vote function.
 
-  
 ## Latex Posting (Does not currently work in live deployment)
 
 - This new feature will be applied to all posts. If the users typed in post/comment matches the regex for block or inline LaTeX rendering, then their post will upload with corresponding latex images.
 - To test this feature, you could try making a post using LaTeX syntax with double $ or single $ around your LaTeX code.
 - Additional tests can be found in test/posts.js file.
 - I added functions to validate renderings for the two types of regexes.
-- Additional type checks for parsing function were added.
+- Additional type checks for the parsing function were added.
