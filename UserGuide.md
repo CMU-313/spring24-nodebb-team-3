@@ -31,4 +31,4 @@
 - To test this feature, you could try making a post using LaTeX syntax with double $ or single $ around your LaTeX code.
 - Additional tests can be found in test/posts.js file.
 - I added functions to validate renderings for the two types of regexes.
-- Additional type checks for parsing function were added.
+- Additional type checks for the parsing function were added.
