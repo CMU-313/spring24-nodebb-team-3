@@ -401,7 +401,7 @@ describe("User", () => {
                     }),
                 ],
                 (err) => {
-                    // assert(err);
+                    assert(err);
                     done();
                 },
             );
