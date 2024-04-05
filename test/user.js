@@ -385,23 +385,26 @@ describe("User", () => {
             meta.config = meta.config || {};
             meta.config.postDelay = "10";
 
-            async.series([
-                async.apply(Topics.post, {
-                    uid: testUid,
-                    title: 'Topic 1',
-                    content: 'lorem ipsum',
-                    cid: testCid,
-                }),
-                async.apply(Topics.post, {
-                    uid: testUid,
-                    title: 'Topic 2',
-                    content: 'lorem ipsum',
-                    cid: testCid,
-                }),
-            ], (err) => {
-                assert(err);
-                done();
-            });
+            async.series(
+                [
+                    async.apply(Topics.post, {
+                        uid: testUid,
+                        title: "Topic 1",
+                        content: "lorem ipsum",
+                        cid: testCid,
+                    }),
+                    async.apply(Topics.post, {
+                        uid: testUid,
+                        title: "Topic 2",
+                        content: "lorem ipsum",
+                        cid: testCid,
+                    }),
+                ],
+                (err) => {
+                    assert(err);
+                    done();
+                },
+            );
         });
 
         it("should allow a post if the last post time is > 10 seconds", (done) => {
